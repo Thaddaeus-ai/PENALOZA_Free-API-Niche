@@ -50,18 +50,18 @@ function renderResults(hits, type) {
     resultsGrid.innerHTML = "";
 
     hits.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'result-item';
+    const div = document.createElement('div');
+    div.className = 'result-item';
 
-        const author = item.username || 'Giphy User';
+    const author = item.username || 'Giphy User';
 
         if (type === 'video') {
             const videoSrc = item.images?.original?.mp4 || '';
 
             div.innerHTML = `
                 <video controls preload="metadata">
-                    <source src="${videoSrc}" type="video/mp4">
-                    Your browser does not support video playback.
+                <source src="${videoSrc}" type="video/mp4">
+                Your browser does not support video playback.
                 </video>
                 <p>By: ${author}</p>
             `;
@@ -69,12 +69,12 @@ function renderResults(hits, type) {
             const imgSrc = item.images?.fixed_height?.url || item.images?.original?.url;
 
             div.innerHTML = `
-                <img src="${imgSrc}" alt="${item.title || 'Giphy GIF'}">
-                <p>By: ${author}</p>
+            <img src="${imgSrc}" alt="${item.title || 'Giphy GIF'}">
+            <p>By: ${author}</p>
             `;
         }
 
-        resultsGrid.appendChild(div);
+    resultsGrid.appendChild(div);
     });
 }
 
