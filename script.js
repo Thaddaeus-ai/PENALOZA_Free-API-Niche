@@ -1,4 +1,4 @@
-// 1. Declare DOM references
+
 const searchInput = document.getElementById('searchInput');
 const mediaType = document.getElementById('mediaType');
 const searchBtn = document.getElementById('searchBtn');
@@ -6,53 +6,39 @@ const loadingIndicator = document.getElementById('loadingIndicator');
 const errorMessage = document.getElementById('errorMessage');
 const resultsGrid = document.getElementById('resultsGrid');
 
-// 2. Preset Search Helper
 function triggerPreset(query) {
     searchInput.value = query;
     fetchData(query, mediaType.value);
 }
-
-// 3. Main Fetch Function using Browse AI Workspace API
 async function fetchData(query, type) {
+    const encodedQuery = encodeURIComponent(query);
+
+    const url = type === 'video'
+        ? `https://api.giphy.com/v1/clips/search?api_key=${CONFIG.API_KEY}&q=${encodedQuery}&limit=12`
+        : `https://api.giphy.com/v1/gifs/search?api_key=${CONFIG.API_KEY}&q=${encodedQuery}&limit=12`;
+
     errorMessage.classList.add('hidden');
     loadingIndicator.classList.remove('hidden');
 
-    // Browse AI task endpoint
-    const url = `https://api.browse.ai/v2/robots/${CONFIG.ROBOT_ID}/tasks`;
-
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${CONFIG.API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                inputParameters: {
-                    originUrl: `https://www.google.com/search?q=${encodeURIComponent(query)}`
-                }
-            })
-        });
+        const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(`Browse AI Error: ${response.status}`);
+            throw new Error(`API Error: ${response.status}`);
         }
-
         const data = await response.json();
+        const results = data.data;
 
-        // Check if extraction data was returned directly
-        const results = data.result?.capturedLists;
-
-        if (!results || Object.keys(results).length === 0) {
-            errorMessage.textContent = "Task started! Check your Browse AI dashboard for live status.";
+        if (!results || results.length === 0) {
+            errorMessage.textContent = "No results found.";
             errorMessage.classList.remove('hidden');
             resultsGrid.innerHTML = "";
         } else {
-            renderResults(results);
+            renderResults(results, type);
         }
     } catch (error) {
         console.error(error);
-        errorMessage.textContent = "Request failed. Check your Browse AI API key or Robot ID.";
+        errorMessage.textContent = "Request failed. Check your API key or connection.";
         errorMessage.classList.remove('hidden');
         resultsGrid.innerHTML = "";
     } finally {
@@ -60,33 +46,38 @@ async function fetchData(query, type) {
     }
 }
 
-// 4. Render Results Function for Browse AI Scraped Items
-function renderResults(capturedLists) {
+function renderResults(hits, type) {
     resultsGrid.innerHTML = "";
 
-    // Grab the primary list extracted by your scraper
-    const primaryKey = Object.keys(capturedLists)[0];
-    const items = capturedLists[primaryKey] || [];
-
-    items.forEach(item => {
+    hits.forEach(item => {
         const div = document.createElement('div');
         div.className = 'result-item';
 
-        // Render scraped images or texts
-        const imageSrc = item.src || item.image || item.thumbnail;
-        const titleText = item.title || item.name || 'Extracted Result';
+        const author = item.username || 'Giphy User';
 
-        div.innerHTML = `
-            ${imageSrc ? `<img src="${imageSrc}" alt="${titleText}">` : ''}
-            <p><strong>${titleText}</strong></p>
-            ${item.link ? `<a href="${item.link}" target="_blank">View Details</a>` : ''}
-        `;
+        if (type === 'video') {
+            const videoSrc = item.images?.original?.mp4 || '';
+
+            div.innerHTML = `
+                <video controls preload="metadata">
+                    <source src="${videoSrc}" type="video/mp4">
+                    Your browser does not support video playback.
+                </video>
+                <p>By: ${author}</p>
+            `;
+        } else {
+            const imgSrc = item.images?.fixed_height?.url || item.images?.original?.url;
+
+            div.innerHTML = `
+                <img src="${imgSrc}" alt="${item.title || 'Giphy GIF'}">
+                <p>By: ${author}</p>
+            `;
+        }
 
         resultsGrid.appendChild(div);
     });
 }
 
-// 5. Event Listeners
 searchBtn.addEventListener('click', () => {
     const query = searchInput.value.trim();
     if (query) {
