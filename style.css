@@ -1,0 +1,25 @@
+body { font-family: sans-serif; background: #f1f1f1; padding: 20px; }
+
+.container { max-width: 1250px; margin: auto; text-align: center; }
+
+.search-section, .challenge-buttons { margin-bottom: 20px; }
+
+input, select, button {
+    padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc;
+}
+
+button { background: #007bff; color: white; cursor: pointer; border: none; }
+
+button:hover { background: #0056b3; }
+
+.results-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;
+}
+
+.result-item img, .result-item video {
+    width: 100%; height: 200px; object-fit: cover; border-radius: 10px;
+}
+
+.hidden { display: none; }
+
+.error { color: red; font-weight: bold; }

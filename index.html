@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triviabar Search Lab</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Triviabar Explorer</h1>
+
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Search for images or videos...">
+            <select id="mediaType">
+                <option value="photo">Photos</option>
+                <option value="video">Videos</option>
+            </select>
+            <button id="searchBtn">Search</button>
+        </div>
+
+        <div class="challenge-buttons">
+            <button onclick="triggerPreset('rocket launch')">🚀 Rocket Launch</button>
+            <button onclick="triggerPreset('basketball')">🏀 Basketball</button>
+            <button onclick="triggerPreset('forest')">🌲 Forest</button>
+            <button onclick="triggerPreset('road forest')">🛣️ Road Forest</button>
+        </div>
+
+        <div id="loadingIndicator" class="hidden">Searching Pexels...</div>
+        <div id="errorMessage" class="error hidden"></div>
+        <div id="resultsGrid" class="results-grid"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
